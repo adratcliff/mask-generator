@@ -12,14 +12,50 @@ export default {
     return {
       width: 0,
       height: 0,
-      rgba: {},
+      rgba: {
+        red: [],
+        green: [],
+        blue: [],
+        alpha: [],
+      },
     };
   },
+  computed: {
+    rgba2d() {
+      return {
+        red: this.transformTo2d(this.rgba.red),
+        green: this.transformTo2d(this.rgba.green),
+        blue: this.transformTo2d(this.rgba.blue),
+        alpha: this.transformTo2d(this.rgba.alpha),
+      }
+    },
+  },
   methods: {
+    transformTo2d(data) {
+      return data.reduce((acc, cur, idx) => {
+        acc[Math.floor(idx / this.width)].push(cur);
+        return acc;
+      }, Array.from(new Array(this.width)).map(() => []));
+    },
+    getUniqueColors() {
+      const findColor = data => data.filter((val, idx) => this.rgba.red[idx] || this.rgba.green[idx] || this.rgba.blue[idx]);
+      const rgbOnlyColor = {
+        red: findColor(this.rgba.red),
+        green: findColor(this.rgba.green),
+        blue: findColor(this.rgba.blue),
+      };
+
+      return Object.values(rgbOnlyColor.red).reduce((acc, cur, idx) => {
+        const obj = { r: cur, g: rgbOnlyColor.green[idx], b: rgbOnlyColor.blue[idx] };
+        if (acc.findIndex(val => val.r === obj.r && val.g === obj.g && val.b === obj.b) !== -1) return acc;
+        acc.push(obj);
+        return acc;
+      }, []);
+    }
   },
   mounted() {
     const img = this.$refs.pic;
-    img.addEventListener('load', e => {
+    img.addEventListener('load', () => {
       this.width = img.clientWidth;
       this.height = img.clientHeight;
 
@@ -29,7 +65,7 @@ export default {
       const ctx = c.getContext('2d');
       ctx.drawImage(img, 0, 0);
 
-      const imgData = ctx.getImageData(0, 0,this. width,this. height);
+      const imgData = ctx.getImageData(0, 0,this.width , this.height);
       const getRgbaVals = (data, val) => data.filter((v, idx) => idx % 4 === val);
 
       this.rgba = {
@@ -39,9 +75,11 @@ export default {
         alpha: getRgbaVals(imgData.data, 3),
       };
 
-      // const g = (getRgbaVals2(imgData.data, 0))
-      // console.log(g)
-      // console.log(g.map(a => a.map(val => val ? 'o' : ' ').join('')).join('\n'))
+      // console.log(this.getUniqueColors().sort((a, b) => a.r - b.r || a.g - b.g || a.b - b.b))
+
+      // this.$nextTick(() => {
+      //   console.log(this.rgba2d.green.map(a => a.map(val => val ? 'o' : ' ').join('')).join('\n'))
+      // })
 
       // let str = '';
       // for (let i = 0; i < (width * height); i++) {
