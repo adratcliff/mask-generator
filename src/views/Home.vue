@@ -1,19 +1,38 @@
 <template>
   <div class="home">
-    <img ref="pic" src="../assets/logo.png">
-    <canvas ref="canvas">Browser does not support HTML5 canvas</canvas>
-    <div class="sampler" />
-    <div class="sampler" />
+    <div>
+      <img ref="pic" src="../assets/logo.png">
+      <canvas ref="canvas">Browser does not support HTML5 canvas</canvas>
+    </div>
+    <div>
+      <div
+        v-for="(color, index) in hslCategories"
+        :key="`category-${color}`">
+        <h5>{{ color | capitalise }}</h5>
+        <div
+          v-for="(subcolor, subcolorIndex) in hslGrouped[index]"
+          :key="`${color}-${subcolorIndex}`"
+          class="color-record">
+          <div class="sampler" :style="`background-color: hsl(${subcolor.h}, ${subcolor.s}%, ${subcolor.l}%)`" />
+          H: {{ subcolor.h }}
+          S: {{ subcolor.s }}
+          L: {{ subcolor.l }}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import rgbToHsl from '../utils/rgbToHsl';
 
+const hslCategories = [ 'red', 'yellow', 'green', 'cyan', 'blue', 'magenta' ];
+
 export default {
   name: 'home',
   data() {
     return {
+      hslCategories,
       width: 0,
       height: 0,
       rgba: {
@@ -62,6 +81,13 @@ export default {
         return acc;
       }, []);
     },
+    hslGrouped() {
+      return this.hslColors.reduce((acc, cur) => {
+        console.log(cur.h, (cur.h + 30) / 60)
+        acc[Math.floor((cur.h + 30) / 60) % 6].push(cur);
+        return acc;
+      }, Array.from(new Array(6)).map(() => []));
+    },
   },
   methods: {
     transformTo2d(data) {
@@ -109,13 +135,22 @@ export default {
       // console.log(str)
     });
   },
+  filters: {
+    capitalise(val) {
+      return val.split('')[0].toUpperCase() + val.slice(1);
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.sampler {
-  width: 100px;
-  height: 100px;
-  border: 1px solid #000;
+.color-record {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .sampler {
+    width: 20px;
+    height: 20px;
+  }
 }
 </style>
