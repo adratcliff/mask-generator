@@ -25,6 +25,10 @@
 
 <script>
 import rgbToHsl from '../utils/rgbToHsl';
+import {
+  hslArraySort,
+  rgbArraySort,
+} from '../utils';
 
 const hslCategories = [ 'red', 'yellow', 'green', 'cyan', 'blue', 'magenta' ];
 
@@ -86,7 +90,7 @@ export default {
         console.log(cur.h, (cur.h + 30) / 60)
         acc[Math.floor((cur.h + 30) / 60) % 6].push(cur);
         return acc;
-      }, Array.from(new Array(6)).map(() => []));
+      }, Array.from(new Array(6)).map(() => [])).sort(hslArraySort);
     },
   },
   methods: {
@@ -119,9 +123,9 @@ export default {
         alpha: getRgbaVals(imgData.data, 3),
       };
 
-      // console.log(this.hslColors.sort((a, b) => a.h - b.h || a.s - b.s || a.l - b.l))
+      // console.log(this.hslColors.sort(hslArraySort)
 
-      // console.log(this.getUniqueColors().sort((a, b) => a.r - b.r || a.g - b.g || a.b - b.b))
+      // console.log(this.getUniqueColors().sort(rgbArraySort)
 
       // this.$nextTick(() => {
       //   console.log(this.rgba2d.green.map(a => a.map(val => val ? 'o' : ' ').join('')).join('\n'))
@@ -151,6 +155,7 @@ export default {
   .sampler {
     width: 20px;
     height: 20px;
+    margin-right: 8px;
   }
 }
 </style>
