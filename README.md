@@ -1,5 +1,7 @@
 # mask-generator
 
+# WIP
+
 ## Project setup
 ```
 npm install
