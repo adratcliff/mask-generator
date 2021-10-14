@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <div>
-      <img ref="pic" src="../assets/logo.png">
-      <canvas ref="canvas">Browser does not support HTML5 canvas</canvas>
+      <img ref="pic" src="../assets/vue-logo.png">
+      <canvas v-show="false" ref="canvas">Browser does not support HTML5 canvas</canvas>
     </div>
     <div>
       <div
@@ -87,7 +87,6 @@ export default {
     },
     hslGrouped() {
       return this.hslColors.reduce((acc, cur) => {
-        console.log(cur.h, (cur.h + 30) / 60)
         acc[Math.floor((cur.h + 30) / 60) % 6].push(cur);
         return acc;
       }, Array.from(new Array(6)).map(() => [])).sort(hslArraySort);
@@ -108,7 +107,7 @@ export default {
       this.height = img.clientHeight;
 
       const c = this.$refs.canvas;
-      c.width = this.width; c.height =this. height;
+      c.width = this.width; c.height = this.height;
 
       const ctx = c.getContext('2d');
       ctx.drawImage(img, 0, 0);
@@ -123,9 +122,9 @@ export default {
         alpha: getRgbaVals(imgData.data, 3),
       };
 
-      // console.log(this.hslColors.sort(hslArraySort)
+      console.log(this.hslColors.sort(hslArraySort));
 
-      // console.log(this.getUniqueColors().sort(rgbArraySort)
+      console.log(this.uniqueColors.sort(rgbArraySort));
 
       // this.$nextTick(() => {
       //   console.log(this.rgba2d.green.map(a => a.map(val => val ? 'o' : ' ').join('')).join('\n'))
@@ -148,6 +147,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+img {
+  max-width: 40vw;
+}
+
 .color-record {
   display: flex;
   align-items: center;
