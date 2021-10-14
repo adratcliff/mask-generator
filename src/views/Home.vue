@@ -2,10 +2,14 @@
   <div class="home">
     <img ref="pic" src="../assets/logo.png">
     <canvas ref="canvas">Browser does not support HTML5 canvas</canvas>
+    <div class="sampler" />
+    <div class="sampler" />
   </div>
 </template>
 
 <script>
+import rgbToHsl from '../utils/rgbToHsl';
+
 export default {
   name: 'home',
   data() {
@@ -29,15 +33,7 @@ export default {
         alpha: this.transformTo2d(this.rgba.alpha),
       }
     },
-  },
-  methods: {
-    transformTo2d(data) {
-      return data.reduce((acc, cur, idx) => {
-        acc[Math.floor(idx / this.width)].push(cur);
-        return acc;
-      }, Array.from(new Array(this.width)).map(() => []));
-    },
-    getUniqueColors() {
+    uniqueColors() {
       const findColor = data => data.filter((val, idx) => this.rgba.red[idx] || this.rgba.green[idx] || this.rgba.blue[idx]);
       const rgbOnlyColor = {
         red: findColor(this.rgba.red),
@@ -51,7 +47,29 @@ export default {
         acc.push(obj);
         return acc;
       }, []);
-    }
+    },
+    hslColors() {
+      return this.uniqueColors.reduce((acc, cur) => {
+        const { h, s, l } = rgbToHsl(cur);
+        const obj = {
+          h: Math.round(h),
+          s: Math.round(s * 100),
+          l: Math.round(l * 100),
+        };
+
+        if (acc.findIndex(val => val.h === val.h && val.s === val.s && val.l === obj.l) !== -1) return acc;
+        acc.push(obj);
+        return acc;
+      }, []);
+    },
+  },
+  methods: {
+    transformTo2d(data) {
+      return data.reduce((acc, cur, idx) => {
+        acc[Math.floor(idx / this.width)].push(cur);
+        return acc;
+      }, Array.from(new Array(this.width)).map(() => []));
+    },
   },
   mounted() {
     const img = this.$refs.pic;
@@ -75,6 +93,8 @@ export default {
         alpha: getRgbaVals(imgData.data, 3),
       };
 
+      // console.log(this.hslColors.sort((a, b) => a.h - b.h || a.s - b.s || a.l - b.l))
+
       // console.log(this.getUniqueColors().sort((a, b) => a.r - b.r || a.g - b.g || a.b - b.b))
 
       // this.$nextTick(() => {
@@ -91,3 +111,11 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.sampler {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #000;
+}
+</style>
