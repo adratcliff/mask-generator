@@ -80,7 +80,7 @@ export default {
           l: Math.round(l * 100),
         };
 
-        if (acc.findIndex(val => val.h === val.h && val.s === val.s && val.l === obj.l) !== -1) return acc;
+        if (acc.findIndex(val => val.h === obj.h && val.s === obj.s && val.l === obj.l) !== -1) return acc;
         acc.push(obj);
         return acc;
       }, []);
