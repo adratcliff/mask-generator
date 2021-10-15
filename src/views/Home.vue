@@ -89,7 +89,7 @@ export default {
       return this.hslColors.reduce((acc, cur) => {
         acc[Math.floor((cur.h + 30) / 60) % 6].push(cur);
         return acc;
-      }, Array.from(new Array(6)).map(() => [])).sort(hslArraySort);
+      }, Array.from(new Array(6)).map(() => [])).map(hslArraySort);
     },
   },
   methods: {
@@ -122,9 +122,9 @@ export default {
         alpha: getRgbaVals(imgData.data, 3),
       };
 
-      console.log(this.hslColors.sort(hslArraySort));
+      // console.log(hslArraySort(this.hslColors));
 
-      console.log(this.uniqueColors.sort(rgbArraySort));
+      // console.log(rgbArraySort(this.uniqueColors));
 
       // this.$nextTick(() => {
       //   console.log(this.rgba2d.green.map(a => a.map(val => val ? 'o' : ' ').join('')).join('\n'))
