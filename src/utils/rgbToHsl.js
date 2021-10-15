@@ -8,8 +8,9 @@ const calcMinMax = (r, g, b) => {
 
   return {
     ...normalisedValues,
-    min: normalised.filter(v => v === min).length > 1 ? 0 : min,
-    max: normalised.filter(v => v === max).length > 1 ? 0 : max,
+    min,
+    max,
+    delta: max - min,
   };
 };
 
@@ -19,30 +20,27 @@ export const calcLightness = (r, g, b) => {
 };
 
 export const calcSaturation = (r, g, b) => {
-  const { min, max } = calcMinMax(r, g, b);
+  const { delta } = calcMinMax(r, g, b);
 
-  if (min === max) return -1;
-  if (calcLightness(r, g, b) < 0.5) return (max - min) / (max + min);
-  return (max - min) / (2 - max - min);
+  if (!delta) return 0;
+  return delta / (1 - Math.abs((2 * calcLightness(r, g, b)) - 1));
 };
 
 export const calcHue = (r, g, b) => {
-  const { min, max, r: nr, g: ng, b: nb } = calcMinMax(r, g, b);
-
-  if (min === max) return -1;
+  const { delta, max, r: nr, g: ng, b: nb } = calcMinMax(r, g, b);
+  if (!delta) return 0;
 
   let hue = 0;
-  const diff = max - min;
 
   switch (max) {
     case nr:
-      hue = (ng - nb) / diff;
+      hue = ((ng - nb) / delta) % 6;
       break;
     case ng:
-      hue = 2 + (nb - nr) / diff;
+      hue = 2 + ((nb - nr) / delta);
       break;
     case b / 255:
-      hue = 4 + (nr - ng) / diff;
+      hue = 4 + ((nr - ng) / delta);
       break;
     default:
       break;
