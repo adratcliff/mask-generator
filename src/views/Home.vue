@@ -102,9 +102,9 @@ export default {
   },
   mounted() {
     const img = this.$refs.pic;
-    img.addEventListener('load', () => {
-      this.width = img.clientWidth;
-      this.height = img.clientHeight;
+    img.addEventListener('load', (e) => {
+      this.width = img.naturalWidth;
+      this.height = img.naturalHeight;
 
       const c = this.$refs.canvas;
       c.width = this.width; c.height = this.height;
