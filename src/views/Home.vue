@@ -1,11 +1,11 @@
 <template>
   <div class="home">
     <div>
-      <img v-show="false" ref="pic" src="../assets/vue-logo.png">
+      <img v-show="false" ref="pic" src="../assets/happy.png">
       <canvas ref="canvas" @click="onclick">Browser does not support HTML5 canvas</canvas>
     </div>
     <div>
-      <div
+      <!-- <div
         v-for="(color, index) in hslCategories"
         :key="`category-${color}`">
         <h5>{{ color | capitalise }}</h5>
@@ -18,7 +18,7 @@
           S: {{ subcolor.s }}
           L: {{ subcolor.l }}
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -45,52 +45,53 @@ export default {
         blue: [],
         alpha: [],
       },
+      colorData: [],
     };
   },
   computed: {
-    rgba2d() {
-      return {
-        red: this.transformTo2d(this.rgba.red),
-        green: this.transformTo2d(this.rgba.green),
-        blue: this.transformTo2d(this.rgba.blue),
-        alpha: this.transformTo2d(this.rgba.alpha),
-      }
-    },
-    uniqueColors() {
-      const findColor = data => data.filter((val, idx) => this.rgba.red[idx] || this.rgba.green[idx] || this.rgba.blue[idx]);
-      const rgbOnlyColor = {
-        red: findColor(this.rgba.red),
-        green: findColor(this.rgba.green),
-        blue: findColor(this.rgba.blue),
-      };
+    // rgba2d() {
+    //   return {
+    //     red: this.transformTo2d(this.rgba.red),
+    //     green: this.transformTo2d(this.rgba.green),
+    //     blue: this.transformTo2d(this.rgba.blue),
+    //     alpha: this.transformTo2d(this.rgba.alpha),
+    //   }
+    // },
+    // uniqueColors() {
+    //   const findColor = data => data.filter((val, idx) => this.rgba.red[idx] || this.rgba.green[idx] || this.rgba.blue[idx]);
+    //   const rgbOnlyColor = {
+    //     red: findColor(this.rgba.red),
+    //     green: findColor(this.rgba.green),
+    //     blue: findColor(this.rgba.blue),
+    //   };
 
-      return Object.values(rgbOnlyColor.red).reduce((acc, cur, idx) => {
-        const obj = { r: cur, g: rgbOnlyColor.green[idx], b: rgbOnlyColor.blue[idx] };
-        if (acc.findIndex(val => val.r === obj.r && val.g === obj.g && val.b === obj.b) !== -1) return acc;
-        acc.push(obj);
-        return acc;
-      }, []);
-    },
-    hslColors() {
-      return this.uniqueColors.reduce((acc, cur) => {
-        const { h, s, l } = rgbToHsl(cur);
-        const obj = {
-          h: Math.round(h),
-          s: Math.round(s * 100),
-          l: Math.round(l * 100),
-        };
+    //   return Object.values(rgbOnlyColor.red).reduce((acc, cur, idx) => {
+    //     const obj = { r: cur, g: rgbOnlyColor.green[idx], b: rgbOnlyColor.blue[idx] };
+    //     if (acc.findIndex(val => val.r === obj.r && val.g === obj.g && val.b === obj.b) !== -1) return acc;
+    //     acc.push(obj);
+    //     return acc;
+    //   }, []);
+    // },
+    // hslColors() {
+    //   return this.uniqueColors.reduce((acc, cur) => {
+    //     const { h, s, l } = rgbToHsl(cur);
+    //     const obj = {
+    //       h: Math.round(h),
+    //       s: Math.round(s * 100),
+    //       l: Math.round(l * 100),
+    //     };
 
-        if (acc.findIndex(val => val.h === obj.h && val.s === obj.s && val.l === obj.l) !== -1) return acc;
-        acc.push(obj);
-        return acc;
-      }, []);
-    },
-    hslGrouped() {
-      return this.hslColors.reduce((acc, cur) => {
-        acc[Math.floor((cur.h + 30) / 60) % 6].push(cur);
-        return acc;
-      }, Array.from(new Array(6)).map(() => [])).map(hslArraySort);
-    },
+    //     if (acc.findIndex(val => val.h === obj.h && val.s === obj.s && val.l === obj.l) !== -1) return acc;
+    //     acc.push(obj);
+    //     return acc;
+    //   }, []);
+    // },
+    // hslGrouped() {
+    //   return this.hslColors.reduce((acc, cur) => {
+    //     acc[Math.floor((cur.h + 30) / 60) % 6].push(cur);
+    //     return acc;
+    //   }, Array.from(new Array(6)).map(() => [])).map(hslArraySort);
+    // },
   },
   methods: {
     transformTo2d(data) {
@@ -126,14 +127,35 @@ export default {
       ctx.drawImage(img, 0, 0);
 
       const imgData = ctx.getImageData(0, 0,this.width , this.height);
-      const getRgbaVals = (data, val) => data.filter((v, idx) => idx % 4 === val);
+      // const getRgbaVals = (data, val) => data.filter((v, idx) => idx % 4 === val);
 
-      this.rgba = {
-        red: getRgbaVals(imgData.data, 0),
-        green: getRgbaVals(imgData.data, 1),
-        blue: getRgbaVals(imgData.data, 2),
-        alpha: getRgbaVals(imgData.data, 3),
-      };
+      // this.rgba = {
+      //   red: getRgbaVals(imgData.data, 0),
+      //   green: getRgbaVals(imgData.data, 1),
+      //   blue: getRgbaVals(imgData.data, 2),
+      //   alpha: getRgbaVals(imgData.data, 3),
+      // };
+      setTimeout(() => {
+        this.colorData = imgData.data.reduce((acc, cur, idx) => {
+          const curIdx = acc.length > 1 ? acc.length - 1 : 0;
+          switch (idx % 4) {
+            case 0:
+              acc.push({ r: cur });
+              break;
+            case 1:
+              acc[curIdx].g = cur;
+              break;
+            case 2:
+              acc[curIdx].b = cur;
+              break;
+            case 3:
+              acc[curIdx].a = cur;
+              Object.assign(acc[curIdx], rgbToHsl(acc[curIdx]));
+              break;
+          }
+          return acc;
+        }, []);
+      }, 500);
 
       // console.log(hslArraySort(this.hslColors));
 
