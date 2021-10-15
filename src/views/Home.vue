@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <div>
-      <img ref="pic" src="../assets/vue-logo.png">
-      <canvas v-show="false" ref="canvas">Browser does not support HTML5 canvas</canvas>
+      <img v-show="false" ref="pic" src="../assets/vue-logo.png">
+      <canvas ref="canvas" @click="onclick">Browser does not support HTML5 canvas</canvas>
     </div>
     <div>
       <div
@@ -98,6 +98,19 @@ export default {
         acc[Math.floor(idx / this.width)].push(cur);
         return acc;
       }, Array.from(new Array(this.width)).map(() => []));
+    },
+    onclick(e) {
+      let x = e.offsetX, y = e.offsetY;
+      console.log(x,y)
+      console.log(this.getRgbaValue(x, y, this.rgba2d), rgbToHsl(this.getRgbaValue(x, y, this.rgba2d)))
+    },
+    getRgbaValue(x, y, rgba) {
+      return {
+        r: rgba.red[y][x],
+        g: rgba.green[y][x],
+        b: rgba.blue[y][x],
+        a: rgba.alpha[y][x],
+      };
     },
   },
   mounted() {
