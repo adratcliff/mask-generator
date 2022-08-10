@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div>
-      <img v-show="true" ref="pic" src="../assets/spider-man.jpg">
+      <img ref="pic" src="../assets/spider-man.jpg">
       <canvas ref="canvas" @click="onclick">Browser does not support HTML5 canvas</canvas>
     </div>
   </div>
