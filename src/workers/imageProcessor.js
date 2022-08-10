@@ -48,8 +48,17 @@ const labToRgb = lab => {
   };
 };
 
+const getTarget = (lab, targets) => {
+  return targets.reduce((acc, cur, idx) => {
+    const dist = Math.sqrt(Math.pow(cur.l - lab.l, 2) + Math.pow(cur.a - lab.a, 2) + Math.pow(cur.b - lab.b, 2));
+    return (!acc || dist < acc.dist) ? { dist, idx } : acc;
+  }, null);
+};
+
 self.onmessage = ({ data: body }) => {
-  self.postMessage(body.data.reduce((acc, cur, idx) => {
+  const labTargets = body.targets.map(colour => rgbToLab(colour));
+
+  self.postMessage(body.img.data.reduce((acc, cur, idx) => {
     const curIdx = acc.length > 1 ? acc.length - 1 : 0;
     switch (idx % 4) {
       case 0:
@@ -64,8 +73,12 @@ self.onmessage = ({ data: body }) => {
       case 3:
         acc[curIdx].rgba.a = cur;
         acc[curIdx].lab = rgbToLab(acc[curIdx].rgba)
+        acc[curIdx].target = getTarget(acc[curIdx].lab, labTargets);
         break;
     }
+    return acc;
+  }, []).reduce((acc, cur) => {
+    acc.push(...Object.values(body.targets[cur.target.idx]));
     return acc;
   }, []));
 };
