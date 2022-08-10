@@ -20,9 +20,10 @@
 // Targets for Spider-Man
 const targets = [
   { r: 102, g: 21,  b: 19,  a: 255 }, // Red
-  { r: 6,   g: 2,   b: 3,   a: 255 }, // Black
-  { r: 85,  g: 104, b: 136, a: 255 }, // Blue
   { r: 156, g: 89,  b: 55,  a: 255 }, // Orange
+  { r: 85,  g: 104, b: 136, a: 255 }, // Blue
+  { r: 116, g: 109, b: 125, a: 255 }, // Gray
+  { r: 6,   g: 2,   b: 3,   a: 255 }, // Black
 ];
 
 export default {
