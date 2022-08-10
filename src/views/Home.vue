@@ -1,13 +1,30 @@
 <template>
   <div class="home">
     <div>
-      <img v-show="false" ref="pic" src="../assets/happy.png">
+      <img v-show="true" ref="pic" src="../assets/spider-man.jpg">
       <canvas ref="canvas" @click="onclick">Browser does not support HTML5 canvas</canvas>
     </div>
   </div>
 </template>
 
 <script>
+// Targets for Happy
+// const targets = [
+//   { r: 54,  g: 148, b: 187, a: 255 }, // Light Blue
+//   { r: 9,   g: 73,  b: 103, a: 255 }, // Dark Blue
+//   { r: 127, g: 179, b: 143, a: 255 }, // Light Green
+//   { r: 58,  g: 109, b: 72,  a: 255 }, // Dark green
+//   { r: 211, g: 203, b: 229, a: 255 }, // White
+// ];
+
+// Targets for Spider-Man
+const targets = [
+  { r: 102, g: 21,  b: 19,  a: 255 }, // Red
+  { r: 6,   g: 2,   b: 3,   a: 255 }, // Black
+  { r: 85,  g: 104, b: 136, a: 255 }, // Blue
+  { r: 156, g: 89,  b: 55,  a: 255 }, // Orange
+];
+
 export default {
   name: 'home',
   data() {
@@ -15,6 +32,7 @@ export default {
       width: 0,
       height: 0,
       colourData: [],
+      ctx: null,
       processor: null,
     };
   },
@@ -35,7 +53,7 @@ export default {
     if (window.Worker) {
       this.processor = new Worker('imageProcessor.js');
       this.processor.onmessage = ({ data }) => {
-        console.log(data)
+        this.ctx.putImageData(new ImageData(new Uint8ClampedArray(data), this.width, this.height), 0, 0);
         console.timeEnd('Process');
       };
     }
@@ -49,13 +67,14 @@ export default {
       c.width = this.width;
       c.height = this.height;
 
-      const ctx = c.getContext('2d');
-      ctx.drawImage(img, 0, 0);
+      this.ctx = c.getContext('2d');
+      this.ctx.drawImage(img, 0, 0);
 
-      const imgData = ctx.getImageData(0, 0, this.width, this.height);
+      const imgData = this.ctx.getImageData(0, 0, this.width, this.height);
       console.log('Begin processing image data');
       console.time('Process')
-      this.processor.postMessage(imgData);
+
+      this.processor.postMessage({ img: imgData, targets });
     });
   },
   filters: {
