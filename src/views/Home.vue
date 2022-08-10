@@ -8,24 +8,13 @@
 </template>
 
 <script>
-import rgbToHsl from '../utils/rgbToHsl';
-
-const hslCategories = [ 'red', 'yellow', 'green', 'cyan', 'blue', 'magenta' ];
-
 export default {
   name: 'home',
   data() {
     return {
-      hslCategories,
       width: 0,
       height: 0,
-      rgba: {
-        red: [],
-        green: [],
-        blue: [],
-        alpha: [],
-      },
-      colorData: [],
+      colourData: [],
       processor: null,
     };
   },
@@ -37,23 +26,18 @@ export default {
       }, Array.from(new Array(this.width)).map(() => []));
     },
     onclick(e) {
-      let x = e.offsetX, y = e.offsetY;
+      const x = e.offsetX;
+      const y = e.offsetY;
       console.log(x,y)
-      console.log(this.getRgbaValue(x, y, this.rgba2d), rgbToHsl(this.getRgbaValue(x, y, this.rgba2d)))
-    },
-    getRgbaValue(x, y, rgba) {
-      return {
-        r: rgba.red[y][x],
-        g: rgba.green[y][x],
-        b: rgba.blue[y][x],
-        a: rgba.alpha[y][x],
-      };
     },
   },
   mounted() {
     if (window.Worker) {
       this.processor = new Worker('imageProcessor.js');
-      this.processor.onmessage = ({ data }) => console.log('proc', data)
+      this.processor.onmessage = ({ data }) => {
+        console.log(data)
+        console.timeEnd('Process');
+      };
     }
 
     const img = this.$refs.pic;
@@ -69,6 +53,8 @@ export default {
       ctx.drawImage(img, 0, 0);
 
       const imgData = ctx.getImageData(0, 0, this.width, this.height);
+      console.log('Begin processing image data');
+      console.time('Process')
       this.processor.postMessage(imgData);
     });
   },
