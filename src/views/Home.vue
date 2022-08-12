@@ -4,6 +4,60 @@
       <img ref="pic" src="../assets/spider-man.jpg">
       <canvas ref="canvas" @click="onclick">Browser does not support HTML5 canvas</canvas>
     </div>
+    <div class="controls">
+      <div class="file-selection">
+        <h5>File</h5>
+        <input
+          type="file"
+          accept="image/*"
+          @change="selectFile" />
+      </div>
+      <div class="colour-selection">
+        <h5>Colours</h5>
+        <div
+          v-for="(col, idx) in targets"
+          :key="`col-${idx}`"
+          class="colour-record">
+          <span class="colour-item">
+            <input
+              type="color"
+              :value="getHex(col)"
+              @change="setColour($event, idx)" />
+            <span class="colour-code">{{ col | formatRgba }}</span>
+          </span>
+          <span class="colour-btns">
+            <button
+              type="button"
+              class="btn remove-btn"
+              @click="removeColour(idx)">
+              x
+            </button>
+          </span>
+        </div>
+        <div class="buttons small">
+          <button
+            type="button"
+            class="btn add-btn"
+            @click="addNewColour">
+            Add New Colour
+          </button>
+          <button
+            type="button"
+            class="btn select-btn"
+            @click="selectNewColour">
+            Select New Colour
+          </button>
+        </div>
+      </div>
+      <div class="buttons">
+        <button
+          type="button"
+          class="btn generate-btn"
+          @click="generate">
+          Generate
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
