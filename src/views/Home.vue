@@ -169,7 +169,7 @@ export default {
       this.selectingColour = true;
     },
     getHex({ r, g, b }) {
-      return '#' + [r, g, b].map(val => val.toString(16)).join('');
+      return '#' + [r, g, b].map(val => val.toString(16).padStart(2, '0')).join('');
     },
     setColour(evt, idx) {
       const hexToDec = start => parseInt(evt.target.value.slice(start, start + 2), 16);
