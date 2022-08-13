@@ -96,6 +96,7 @@ export default {
       imageSrc: require('../assets/grogu-rock.png'),
       targets: [ ...defaultTargets ],
       selectingColour: false,
+      blur: { dist: 5 },
     };
   },
   methods: {
@@ -152,7 +153,7 @@ export default {
       console.log('Begin processing image data');
       console.time('Process')
 
-      this.processor.postMessage({ img: this.imgData, targets: this.targets });
+      this.processor.postMessage({ img: this.imgData, targets: this.targets, blur: this.blur });
     },
   },
   mounted() {

@@ -58,27 +58,43 @@ const getTarget = (lab, targets) => {
 self.onmessage = ({ data: body }) => {
   const labTargets = body.targets.map(colour => rgbToLab(colour));
 
+  const { dist, type } = body.blur;
+
   self.postMessage(body.img.data.reduce((acc, cur, idx) => {
     const curIdx = acc.length > 1 ? acc.length - 1 : 0;
     switch (idx % 4) {
       case 0:
-        acc.push({ rgba: { r: cur } });
+        acc.push({ r: cur });
         break;
       case 1:
-        acc[curIdx].rgba.g = cur;
+        acc[curIdx].g = cur;
         break;
       case 2:
-        acc[curIdx].rgba.b = cur;
+        acc[curIdx].b = cur;
         break;
       case 3:
-        acc[curIdx].rgba.a = cur;
-        acc[curIdx].lab = rgbToLab(acc[curIdx].rgba)
-        acc[curIdx].target = getTarget(acc[curIdx].lab, labTargets);
+        acc[curIdx].a = cur;
         break;
     }
     return acc;
-  }, []).reduce((acc, cur) => {
-    acc.push(...Object.values(body.targets[cur.target.idx]));
+  }, []).reduce((acc, cur, idx, self) => {
+    let rgb = cur;
+    if (dist) {
+      const posX = idx % body.img.width;
+      const posY = Math.floor(idx / body.img.width);
+      const xMin = Math.max(0, posX - dist);
+      const xMax = Math.min(body.img.width, posX + dist);
+      const yMin = Math.max(0, posY - dist);
+      const yMax = Math.min(body.img.height, posY + dist);
+
+      const blurredElements = [ ...new Array(yMax - yMin).keys() ].map(y => ([ ...new Array(xMax - xMin).keys() ].map(x => self[(y + yMin) * body.img.width + x + xMin]))).flat();
+      const blurLength = blurredElements.length;
+      const blurredSum = blurredElements.reduce((acc, cur) => ({ r: acc.r + cur.r, g: acc.g + cur.g, b: acc.b + cur.b, a: acc.a + cur.b }), { r: 0, g: 0, b: 0, a: 0 });
+
+      rgb = { r: blurredSum.r / blurLength, g: blurredSum.g / blurLength, b: blurredSum.b / blurLength, a: blurredSum.a / blurLength };
+    }
+
+    acc.push(...Object.values(body.targets[getTarget(rgbToLab(rgb), labTargets).idx]));
     return acc;
   }, []));
 };
