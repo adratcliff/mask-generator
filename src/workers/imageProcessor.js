@@ -60,7 +60,10 @@ self.onmessage = ({ data: body }) => {
 
   const { dist, type } = body.blur;
 
-  self.postMessage(body.img.data.reduce((acc, cur, idx) => {
+  let progress = 0;
+  const progressPart = 100 / (body.img.width * body.img.height * 2);
+
+  const processed = body.img.data.reduce((acc, cur, idx) => {
     const curIdx = acc.length > 1 ? acc.length - 1 : 0;
     switch (idx % 4) {
       case 0:
@@ -74,10 +77,14 @@ self.onmessage = ({ data: body }) => {
         break;
       case 3:
         acc[curIdx].a = cur;
+
+        progress += progressPart;
+        if (Math.floor(progress) > Math.floor(progress - progressPart)) self.postMessage({ type: 'set-progress', value: progress })
+
         break;
     }
     return acc;
-  }, []).reduce((acc, cur, idx, self) => {
+  }, []).reduce((acc, cur, idx, processed) => {
     let rgb = cur;
     if (dist) {
       const posX = idx % body.img.width;
@@ -87,7 +94,7 @@ self.onmessage = ({ data: body }) => {
       const yMin = Math.max(0, posY - dist);
       const yMax = Math.min(body.img.height, posY + dist);
 
-      const blurredElements = [ ...new Array(yMax - yMin).keys() ].map(y => ([ ...new Array(xMax - xMin).keys() ].map(x => self[(y + yMin) * body.img.width + x + xMin]))).flat();
+      const blurredElements = [ ...new Array(yMax - yMin).keys() ].map(y => ([ ...new Array(xMax - xMin).keys() ].map(x => processed[(y + yMin) * body.img.width + x + xMin]))).flat();
       const blurLength = blurredElements.length;
       const blurredSum = blurredElements.reduce((acc, cur) => ({ r: acc.r + cur.r, g: acc.g + cur.g, b: acc.b + cur.b, a: acc.a + cur.b }), { r: 0, g: 0, b: 0, a: 0 });
 
@@ -95,6 +102,12 @@ self.onmessage = ({ data: body }) => {
     }
 
     acc.push(...Object.values(body.targets[getTarget(rgbToLab(rgb), labTargets).idx]));
+
+    progress += progressPart;
+    if (Math.floor(progress) > Math.floor(progress - progressPart)) self.postMessage({ type: 'set-progress', value: progress })
+
     return acc;
-  }, []));
+  }, []);
+
+  self.postMessage({ type: 'set-data', value: processed });
 };

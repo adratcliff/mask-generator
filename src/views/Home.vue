@@ -55,6 +55,7 @@
         <button
           type="button"
           class="btn"
+          :disabled="generation !== null"
           @click="generate">
           Generate
         </button>
@@ -65,6 +66,13 @@
           @click="save">
           Save
         </button>
+      </div>
+      <div v-if="generation !== null" class="progress">
+        <div class="bar">
+          <div class="background" />
+          <div class="progress-indicator" :style="`width: ${generation}%;`" />
+        </div>
+        <span class="total">{{ generation }}%</span>
       </div>
     </div>
     <a id="link" />
@@ -109,6 +117,7 @@ export default {
       selectingColour: false,
       blur: { dist: 1 },
       generated: false,
+      generation: null,
     };
   },
   methods: {
@@ -169,6 +178,7 @@ export default {
       console.log('Begin processing image data');
       console.time('Process')
 
+      this.generation = 0;
       this.processor.postMessage({ img: this.imgData, targets: this.targets, blur: this.blur });
     },
     save() {
@@ -182,9 +192,20 @@ export default {
     if (window.Worker) {
       this.processor = new Worker('imageProcessor.js');
       this.processor.onmessage = ({ data }) => {
-        this.ctx.putImageData(new ImageData(new Uint8ClampedArray(data), this.width, this.height), 0, 0);
-        this.generated = true;
-        console.timeEnd('Process');
+        switch (data.type) {
+          case 'set-data':
+            this.ctx.putImageData(new ImageData(new Uint8ClampedArray(data.value), this.width, this.height), 0, 0);
+            this.generated = true;
+            this.generation = null;
+            console.timeEnd('Process');
+            break;
+          case 'set-progress':
+            console.log(data.value)
+            this.generation = Math.floor(data.value);
+            break;
+          default:
+            break;
+        }
       };
     }
 
@@ -241,8 +262,8 @@ button.btn {
     border-color: #0d6efd;
   }
   &:disabled {
-    color: #6c757d;
-    border-color: #6c757d;
+    color: #7d8388;
+    border-color: #c9c9c9;
   }
 }
 
@@ -303,6 +324,36 @@ button.btn {
             }
           }
         }
+      }
+    }
+    .progress {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      .bar {
+        width: 85%;
+        height: 20px;
+        position: relative;
+        .background {
+          height: 20px;
+          width: 100%;
+          position: absolute;
+          top: 0;
+          border-radius: 4px;
+          background-color: #c9c9c944;
+        }
+        .progress-indicator {
+          height: 20px;
+          position: absolute;
+          top: 0;
+          border-radius: 4px;
+          background-color: #0d6efd;
+          transition: width ease 0.3s;
+        }
+      }
+      .total {
+        width: 15%;
+        text-align: right;
       }
     }
     .buttons {
