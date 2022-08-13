@@ -54,12 +54,20 @@
       <div class="buttons">
         <button
           type="button"
-          class="btn generate-btn"
+          class="btn"
           @click="generate">
           Generate
         </button>
+        <button
+          type="button"
+          class="btn"
+          :disabled="!generated"
+          @click="save">
+          Save
+        </button>
       </div>
     </div>
+    <a id="link" />
   </div>
 </template>
 
@@ -82,6 +90,8 @@ const defaultTargets = [
 //   { r: 6,   g: 2,   b: 3,   a: 255 }, // Black
 // ];
 
+const defaultFile = 'grogu-rock.png';
+
 export default {
   name: 'home',
   data() {
@@ -93,10 +103,12 @@ export default {
       ctx: null,
       processor: null,
       imgData: null,
-      imageSrc: require('../assets/grogu-rock.png'),
+      imageSrc: require(`../assets/${defaultFile}`),
+      fileName: defaultFile,
       targets: [ ...defaultTargets ],
       selectingColour: false,
-      blur: { dist: 5 },
+      blur: { dist: 1 },
+      generated: false,
     };
   },
   methods: {
@@ -125,8 +137,12 @@ export default {
     selectFile(evt) {
       if (!evt.target.files.length) return;
       const reader = new FileReader();
-      reader.onload = () => this.imageSrc = reader.result;
+      reader.onload = () => {
+        this.imageSrc = reader.result;
+        this.generated = false;
+      };
       reader.readAsDataURL(evt.target.files[0]);
+      this.fileName = evt.target.files[0].name;
     },
     removeColour(idx) {
       this.targets.splice(idx, 1);
@@ -155,12 +171,19 @@ export default {
 
       this.processor.postMessage({ img: this.imgData, targets: this.targets, blur: this.blur });
     },
+    save() {
+      const link = document.getElementById('link');
+      link.setAttribute('download', `${this.fileName.split('.').slice(0, -1).join('.')}-c${this.targets.length}-b${this.blur.dist}.png`);
+      link.setAttribute('href', this.$refs.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
+      link.click();
+    },
   },
   mounted() {
     if (window.Worker) {
       this.processor = new Worker('imageProcessor.js');
       this.processor.onmessage = ({ data }) => {
         this.ctx.putImageData(new ImageData(new Uint8ClampedArray(data), this.width, this.height), 0, 0);
+        this.generated = true;
         console.timeEnd('Process');
       };
     }
@@ -194,7 +217,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button {
+button.btn {
   cursor: pointer;
   outline: 0;
   display: inline-block;
@@ -212,10 +235,14 @@ button {
     box-shadow .15s ease-in-out;
   color: #0d6efd;
   border-color: #0d6efd;
-  &:hover {
+  &:hover:not(:disabled) {
     color: #fff;
     background-color: #0d6efd;
     border-color: #0d6efd;
+  }
+  &:disabled {
+    color: #6c757d;
+    border-color: #6c757d;
   }
 }
 
