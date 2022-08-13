@@ -212,7 +212,6 @@ export default {
             console.timeEnd('Process');
             break;
           case 'set-progress':
-            console.log(data.value)
             this.generation = Math.floor(data.value);
             break;
           default:
@@ -360,7 +359,7 @@ button.btn {
           top: 0;
           border-radius: 4px;
           background-color: #0d6efd;
-          transition: width ease 0.3s;
+          transition: width ease-in-out 0.3s;
         }
       }
       .total {
