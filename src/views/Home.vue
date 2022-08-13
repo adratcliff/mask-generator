@@ -51,6 +51,15 @@
           </button>
         </div>
       </div>
+      <div class="colour-selection">
+        <h5>Blur</h5>
+        <input
+          type="number"
+          min="0"
+          max="50"
+          v-model="blur.dist"
+          @input="updateDist" />
+      </div>
       <div class="buttons">
         <button
           type="button"
@@ -186,6 +195,9 @@ export default {
       link.setAttribute('download', `${this.fileName.split('.').slice(0, -1).join('.')}-c${this.targets.length}-b${this.blur.dist}.png`);
       link.setAttribute('href', this.$refs.canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
       link.click();
+    },
+    updateDist() {
+      this.blur.dist = Math.max(Math.min(Math.floor(this.blur.dist), 50), 0);
     },
   },
   mounted() {
