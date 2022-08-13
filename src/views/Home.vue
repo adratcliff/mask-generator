@@ -14,25 +14,27 @@
       </div>
       <div class="colour-selection">
         <h5>Colours</h5>
-        <div
-          v-for="(col, idx) in targets"
-          :key="`col-${idx}`"
-          class="colour-record">
-          <span class="colour-item">
-            <input
-              type="color"
-              :value="getHex(col)"
-              @change="setColour($event, idx)" />
-            <span class="colour-code">{{ col | formatRgba }}</span>
-          </span>
-          <span class="colour-btns">
-            <button
-              type="button"
-              class="btn remove-btn"
-              @click="removeColour(idx)">
-              x
-            </button>
-          </span>
+        <div class="colour-records">
+          <div
+            v-for="(col, idx) in targets"
+            :key="`col-${idx}`"
+            class="colour-record">
+            <span class="colour-item">
+              <input
+                type="color"
+                :value="getHex(col)"
+                @change="setColour($event, idx)" />
+              <span class="colour-code">{{ col | formatRgba }}</span>
+            </span>
+            <span class="colour-btns">
+              <button
+                type="button"
+                class="btn remove-btn"
+                @click="removeColour(idx)">
+                x
+              </button>
+            </span>
+          </div>
         </div>
         <div class="buttons small">
           <button
@@ -241,30 +243,35 @@ button {
     }
     .colour-selection {
       margin: 24px 0;
-      .colour-record {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 4px 0;
-        .colour-item {
+      .colour-records {
+        max-height: 75vh;
+        overflow-y: auto;
+        padding-right: 4px;
+        .colour-record {
           display: flex;
           align-items: center;
-          .colour-code {
-            font-family: monospace;
-            white-space: break-spaces;
-            margin-left: 8px;
+          justify-content: space-between;
+          padding: 4px 0;
+          .colour-item {
+            display: flex;
+            align-items: center;
+            .colour-code {
+              font-family: monospace;
+              white-space: break-spaces;
+              margin-left: 8px;
+            }
           }
-        }
-        .colour-btns {
-          .remove-btn {
-            margin-left: 8px;
-            padding: 0px 8px;
-            color: #dc3545;
-            border-color: #dc3545;
-            &:hover {
-              color: #fff;
-              background-color: #dc3545;
+          .colour-btns {
+            .remove-btn {
+              margin-left: 8px;
+              padding: 0px 8px;
+              color: #dc3545;
               border-color: #dc3545;
+              &:hover {
+                color: #fff;
+                background-color: #dc3545;
+                border-color: #dc3545;
+              }
             }
           }
         }
