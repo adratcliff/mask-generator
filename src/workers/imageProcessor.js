@@ -61,7 +61,7 @@ self.onmessage = ({ data: body }) => {
   const { dist, type } = body.blur;
 
   let progress = 0;
-  const progressPart = 100 / (body.img.width * body.img.height * 2);
+  const progressPart = 100 / (body.img.width * body.img.height * 3);
 
   const processed = body.img.data.reduce((acc, cur, idx) => {
     const curIdx = acc.length > 1 ? acc.length - 1 : 0;
@@ -103,8 +103,8 @@ self.onmessage = ({ data: body }) => {
 
     acc.push(...Object.values(body.targets[getTarget(rgbToLab(rgb), labTargets).idx]));
 
-    progress += progressPart;
-    if (Math.floor(progress) > Math.floor(progress - progressPart)) self.postMessage({ type: 'set-progress', value: progress })
+    progress += progressPart * 2;
+    if (Math.floor(progress) > Math.floor(progress - (progressPart * 2))) self.postMessage({ type: 'set-progress', value: progress })
 
     return acc;
   }, []);
