@@ -1,6 +1,7 @@
 # mask-generator
 
-# WIP
+Load an image, select a select few numbers, and run.
+The program will generate a colour-by-numbers style image by mapping each pixel in your original image to the closest that you selected.
 
 ## Project setup
 ```
