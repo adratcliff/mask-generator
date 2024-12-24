@@ -24,7 +24,7 @@
                 type="color"
                 :value="getHex(col)"
                 @change="setColour($event, idx)" />
-              <span class="colour-code">{{ col | formatRgba }}</span>
+              <span class="colour-code">{{ formatRgba(col) }}</span>
             </span>
             <span class="colour-btns">
               <button
@@ -89,14 +89,15 @@
 </template>
 
 <script>
+import { formatRgba } from '@/utils';
 // Targets for Happy
-const defaultTargets = [
-  { r: 54,  g: 148, b: 187, a: 255 }, // Light Blue
-  { r: 9,   g: 73,  b: 103, a: 255 }, // Dark Blue
-  { r: 127, g: 179, b: 143, a: 255 }, // Light Green
-  { r: 58,  g: 109, b: 72,  a: 255 }, // Dark green
-  { r: 211, g: 203, b: 229, a: 255 }, // White
-];
+// const defaultTargets = [
+//   { r: 54,  g: 148, b: 187, a: 255 }, // Light Blue
+//   { r: 9,   g: 73,  b: 103, a: 255 }, // Dark Blue
+//   { r: 127, g: 179, b: 143, a: 255 }, // Light Green
+//   { r: 58,  g: 109, b: 72,  a: 255 }, // Dark green
+//   { r: 211, g: 203, b: 229, a: 255 }, // White
+// ];
 
 // Targets for Spider-Man
 // const defaultTargets = [
@@ -107,7 +108,17 @@ const defaultTargets = [
 //   { r: 6,   g: 2,   b: 3,   a: 255 }, // Black
 // ];
 
-const defaultFile = 'grogu-rock.png';
+const defaultTargets = [
+  { r: 0,   g: 4,   b: 9,   a: 255 }, // Black
+  { r: 232, g: 242, b: 249, a: 255 }, // White
+  { r: 182, g: 181, b: 168, a: 255 }, // Tan
+  { r: 255, g: 194, b: 73,  a: 255 }, // Yellow
+  { r: 40,  g: 50,  b: 30,  a: 255 }, // Green
+  { r: 21,  g: 72,  b: 146, a: 255 }, // Dark Blue
+  { r: 101, g: 168, b: 243, a: 255 }, // Light Blue
+];
+
+const defaultFile = 'booster.jpeg';
 
 export default {
   name: 'home',
@@ -130,6 +141,7 @@ export default {
     };
   },
   methods: {
+    formatRgba,
     transformTo2d(data) {
       return data.reduce((acc, cur, idx) => {
         acc[Math.floor(idx / this.width)].push(cur);
@@ -236,15 +248,6 @@ export default {
       this.imgData = this.ctx.getImageData(0, 0, this.width, this.height);
     });
   },
-  filters: {
-    capitalise(val) {
-      return val.split('')[0].toUpperCase() + val.slice(1);
-    },
-    formatRgba(val) {
-      const padVal = a => val[a].toString().padStart(3, ' ');
-      return `R: ${padVal('r')}, G: ${padVal('g')}, B: ${padVal('b')}, A: ${padVal('a')}`;
-    },
-  }
 }
 </script>
 
