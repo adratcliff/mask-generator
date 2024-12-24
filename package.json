@@ -1,13 +1,22 @@
 {
   "name": "quantization",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:page": "vue-cli-service build --target lib --name quantization src/views/HomeView.vue",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"
+  },
+  "main": "dist/quantization.umd.js",
+  "module": "dist/quantization.umd.js",
+  "exports": {
+    "*": {
+      "require": "./dist/quantization.umd.js",
+      "style": "./dist/quantization.css"
+    }
   },
   "dependencies": {
     "core-js": "^3.8.3",
