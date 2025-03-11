@@ -140,6 +140,12 @@ export default {
       generation: null,
     };
   },
+  props: {
+    worker: {
+      type: Function,
+      default: () => new Worker('imageProcessor.js'),
+    },
+  },
   methods: {
     formatRgba,
     transformTo2d(data) {
@@ -185,12 +191,12 @@ export default {
     },
     setColour(evt, idx) {
       const hexToDec = start => parseInt(evt.target.value.slice(start, start + 2), 16);
-      this.$set(this.targets, idx, {
+      this.targets[idx] = {
         r: hexToDec(1),
         g: hexToDec(3),
         b: hexToDec(5),
         a: 255,
-      });
+      };
     },
     addNewColour() {
       this.targets.push({ r: 0, g: 0, b: 0, a: 0 });
@@ -200,7 +206,7 @@ export default {
       console.time('Process')
 
       this.generation = 0;
-      this.processor.postMessage({ img: this.imgData, targets: this.targets, blur: this.blur });
+      this.processor.postMessage(JSON.stringify({ img: this.imgData, targets: this.targets, blur: this.blur }));
     },
     save() {
       const link = document.getElementById('link');
@@ -212,9 +218,9 @@ export default {
       this.blur.dist = Math.max(Math.min(Math.floor(this.blur.dist), 50), 0);
     },
   },
-  mounted() {
+  async mounted() {
     if (window.Worker) {
-      this.processor = new Worker('imageProcessor.js');
+      this.processor = await this.worker();
       this.processor.onmessage = ({ data }) => {
         switch (data.type) {
           case 'set-data':
@@ -245,7 +251,19 @@ export default {
       this.ctx = c.getContext('2d');
       this.ctx.drawImage(img, 0, 0);
 
-      this.imgData = this.ctx.getImageData(0, 0, this.width, this.height);
+      const {
+        data,
+        height,
+        width,
+        colorSpace,
+      } = this.ctx.getImageData(0, 0, this.width, this.height);
+
+      this.imgData = {
+        data: [...data],
+        height,
+        width,
+        colorSpace,
+      };
     });
   },
 }

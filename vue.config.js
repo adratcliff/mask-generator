@@ -1,4 +1,6 @@
 const { defineConfig } = require('@vue/cli-service');
+const CopyPlugin = require("copy-webpack-plugin");
+
 module.exports = defineConfig({
   transpileDependencies: true,
   configureWebpack: {
@@ -8,5 +10,12 @@ module.exports = defineConfig({
       'vue',
       'vue-router',
     ],
+  },
+  chainWebpack: (config) => {
+    config.plugin('copy').use(CopyPlugin, [
+      {
+        patterns: [{ from: './src/workers', to: './'}],
+      },
+    ]);
   },
 });

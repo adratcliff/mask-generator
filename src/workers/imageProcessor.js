@@ -23,6 +23,7 @@ const rgbToLab = rgb => {
   };
 };
 
+// eslint-disable-next-line no-unused-vars
 const labToRgb = lab => {
   let y = (lab.l + 16) / 116,
       x = lab.a / 500 + y,
@@ -55,15 +56,16 @@ const getTarget = (lab, targets) => {
   }, null);
 };
 
-self.onmessage = ({ data: body }) => {
+self.onmessage = ({ data }) => {
+  const body = JSON.parse(data);
   const labTargets = body.targets.map(colour => rgbToLab(colour));
 
-  const { dist, type } = body.blur;
+  const { dist } = body.blur;
 
   let progress = 0;
   const progressPart = 100 / (body.img.width * body.img.height * 3);
 
-  const processed = body.img.data.reduce((acc, cur, idx) => {
+  const processed = Object.values(body.img.data).reduce((acc, cur, idx) => {
     const curIdx = acc.length > 1 ? acc.length - 1 : 0;
     switch (idx % 4) {
       case 0:
